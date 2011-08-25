@@ -1,10 +1,9 @@
 # data.csv
 
-`data.csv` is a clojure library for reading and writing comma
+`data.csv` is a Clojure library for reading and writing comma
 separated value (csv) files. It is licensed under the [Eclipse open
 source license](http://www.opensource.org/licenses/eclipse-1.0.php).
-
-The library has been tested on Clojure version 1.2, 1.2.1 and
+The library has been tested on Clojure versions 1.2, 1.2.1 and
 1.3-beta1.
 
 ## Installation
@@ -16,14 +15,14 @@ Add
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>data.csv</artifactId>
-      <version>0.0.1</version>
+      <version>0.1.0</version>
     </dependency>
 
 to your `pom.xml` file.
 
 ### Using leiningen
 
-Add `[org.clojure/data.csv "0.0.1"]` as a dependency to your `project.clj`.
+Add `[org.clojure/data.csv "0.1.0"]` as a dependency to your `project.clj`.
 
 ## Usage
 
@@ -43,10 +42,10 @@ Add `[org.clojure/data.csv "0.0.1"]` as a dependency to your `project.clj`.
 
 ### Reading
 
-data.csv supports [RFC
-4180](http://tools.ietf.org/html/rfc4180). Additionally, it is
-possible to choose separator and quote characters. Reading is *fast*
-and *lazy*. See `(doc read-csv)` for available options.
+`data.csv` supports [RFC 4180](http://tools.ietf.org/html/rfc4180).
+Additionally, it is possible to choose separator and quote
+characters. Reading is *fast* and *lazy*. See `(doc read-csv)` for
+available options.
 
 ### Writing
 
