@@ -20,49 +20,48 @@
 (def ^{:private true} cr  (int \return))
 (def ^{:private true} eof -1)
 
-(defn- read-quoted-cell [^Reader reader sep quote]
-  (let [sb (StringBuilder.)]
-    (loop [ch (.read reader)]
-      (condp == ch
-	  quote (let [next-ch (.read reader)]
-		  (condp == next-ch
-		      quote (do (.append sb (char quote))
-				(recur (.read reader)))
-		      sep [(str sb) :sep]
-		      lf  [(str sb) :eol]
-		      cr  (if (== (.read reader) lf)
-			    [(str sb) :eol]
-			    (throw (Exception. ^String (format "CSV error (unexpected character: %c)" next-ch))))
-		      eof [(str sb) :eof]
-		      (throw (Exception. ^String (format "CSV error (unexpected character: %c)" next-ch)))))
-	  eof (throw (EOFException. "CSV error (unexpected end of file)"))
-	  (do (.append sb (char ch))
-	      (recur (.read reader)))))))
-	   
-(defn- read-cell [^Reader reader sep quote]
-  (let [sb (StringBuilder.)]
-    (let [first-ch (.read reader)]
-      (if (== first-ch quote)
-	(read-quoted-cell reader sep quote)
-	(loop [ch first-ch]
-	  (condp == ch
-	      sep [(str sb) :sep]
-	      lf  [(str sb) :eol]
-	      cr (let [next-ch (.read reader)]
-		   (if (== next-ch lf)
-		     [(str sb) :eol]
-		     (do (.append sb \return)
-			 (recur next-ch))))
-	      eof [(str sb) :eof]
-	      (do (.append sb (char ch))
-		  (recur (.read reader)))))))))
+(defn- read-quoted-cell [^Reader reader ^StringBuilder sb sep quote]
+  (loop [ch (.read reader)]
+    (condp == ch
+      quote (let [next-ch (.read reader)]
+              (condp == next-ch
+                quote (do (.append sb (char quote))
+                          (recur (.read reader)))
+                sep :sep
+                lf  :eol
+                cr  (if (== (.read reader) lf)
+                      :eol
+                      (throw (Exception. ^String (format "CSV error (unexpected character: %c)" next-ch))))
+                eof :eof
+                (throw (Exception. ^String (format "CSV error (unexpected character: %c)" next-ch)))))
+      eof (throw (EOFException. "CSV error (unexpected end of file)"))
+      (do (.append sb (char ch))
+          (recur (.read reader))))))
+
+(defn- read-cell [^Reader reader ^StringBuilder sb sep quote]
+  (let [first-ch (.read reader)]
+    (if (== first-ch quote)
+      (read-quoted-cell reader sb sep quote)
+      (loop [ch first-ch]
+        (condp == ch
+          sep :sep
+          lf  :eol
+          cr (let [next-ch (.read reader)]
+               (if (== next-ch lf)
+                 :eol
+                 (do (.append sb \return)
+                     (recur next-ch))))
+          eof :eof
+          (do (.append sb (char ch))
+              (recur (.read reader))))))))
 
 (defn- read-record [reader sep quote]
   (loop [record (transient [])]
-    (let [[cell sentinel] (read-cell reader sep quote)]
-      (case sentinel
-	:sep (recur (conj! record cell))
-	[(persistent! (conj! record cell)) sentinel]))))
+    (let [cell (StringBuilder.)
+          sentinel (read-cell reader cell sep quote)]
+      (if (= sentinel :sep)
+	(recur (conj! record (str cell)))
+	[(persistent! (conj! record (str cell))) sentinel]))))
 
 (defprotocol Read-CSV-From
   (read-csv-from [input sep quote]))
@@ -91,7 +90,6 @@
   [input & options]
   (let [{:keys [separator quote] :or {separator \, quote \"}} options]
     (read-csv-from input (int separator) (int quote))))
-
 
 
 ;; Writing
