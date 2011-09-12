@@ -21,10 +21,17 @@ air, moon roof, loaded\",4799.00")
 (deftest reading
   (let [csv (read-csv simple)]
     (is (= (count csv) 3))
-    (is (= (count (first csv)) 3)))
+    (is (= (count (first csv)) 3))
+    (is (= (first csv) ["Year" "Make" "Model"]))
+    (is (= (last csv) ["2000" "Mercury" "Cougar"])))
   (let [csv (read-csv complicated)]
     (is (= (count csv) 4))
-    (is (= (count (first csv)) 5))))
+    (is (= (count (first csv)) 5))
+    (is (= (first csv)
+           ["1997" "Ford" "E350" "ac, abs, moon" "3000.00"]))
+    (is (= (last csv)
+           ["1996" "Jeep" "Grand Cherokee", "MUST SELL!\nair, moon roof, loaded" "4799.00"]))))
+        
 
 (deftest reading-and-writing
   (let [string-writer (StringWriter.)]
