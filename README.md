@@ -4,7 +4,7 @@
 separated value (csv) files. It is licensed under the [Eclipse open
 source license](http://www.opensource.org/licenses/eclipse-1.0.php).
 The library has been tested on Clojure versions 1.2, 1.2.1 and
-1.3-beta1.
+1.3.
 
 ## Installation
 
