@@ -56,13 +56,12 @@
               (recur (.read reader))))))))
 
 (defn- read-record [reader sep quote]
-  (let [cell (StringBuilder.)]
-    (loop [record (transient [])]
-      (.setLength cell 0)
-      (let [sentinel (read-cell reader cell sep quote)]
-        (if (= sentinel :sep)
-          (recur (conj! record (str cell)))
-          [(persistent! (conj! record (str cell))) sentinel])))))
+  (loop [record (transient [])]
+    (let [cell (StringBuilder.)
+          sentinel (read-cell reader cell sep quote)]
+      (if (= sentinel :sep)
+        (recur (conj! record (str cell)))
+        [(persistent! (conj! record (str cell))) sentinel]))))
 
 (defprotocol Read-CSV-From
   (read-csv-from [input sep quote]))
