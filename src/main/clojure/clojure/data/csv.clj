@@ -94,9 +94,9 @@
 
 ;; Writing
 
-(defn- write-cell [^Writer writer obj sep quote]
+(defn- write-cell [^Writer writer obj sep quote quote?]
   (let [string (str obj)
-	must-quote (some #{sep quote \newline} string)]
+	must-quote (quote? string)]
     (when must-quote (.write writer (int quote)))
     (.write writer (if must-quote
 		     (str/escape string
@@ -104,19 +104,19 @@
 		     string))
     (when must-quote (.write writer (int quote)))))
 
-(defn- write-record [^Writer writer record sep quote]
+(defn- write-record [^Writer writer record sep quote quote?]
   (loop [record record]
     (when-first [cell record]
-      (write-cell writer cell sep quote)
+      (write-cell writer cell sep quote quote?)
       (when-let [more (next record)]
 	(.write writer (int sep))
 	(recur more)))))
 
 (defn- write-csv*
-  [^Writer writer records sep quote ^String newline]
+  [^Writer writer records sep quote quote? ^String newline]
   (loop [records records]
     (when-first [record records]
-      (write-record writer record sep quote)
+      (write-record writer record sep quote quote?)
       (.write writer newline)
       (recur (next records)))))
 
@@ -124,13 +124,19 @@
   "Writes data to writer in CSV-format.
 
    Valid options are
-     :separator (default \\,)
-     :quote (default \\\")
+     :separator (Default \\,)
+     :quote (Default \\\")
+     :guote? (A predicate function which determines if a string should be quoted. Defaults to quoting only when necessary.)
      :newline (:lf (default) or :cr+lf)"
   [writer data & options]
-  (let [{:keys [separator quote newline] :or {separator \, quote \" newline :lf}} options]
+  (let [opts (into {} options)
+        separator (or (:separator opts) \,)
+        quote (or (:quote opts) \")
+        quote? (or (:quote? opts) #(some #{separator quote \return \newline} %))
+        newline (or (:newline opts) :lf)]
     (write-csv* writer
 		data
 		separator
 		quote
+                quote?
 		({:lf "\n" :cr+lf "\r\n"} newline))))
