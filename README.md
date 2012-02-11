@@ -1,21 +1,26 @@
-# data.csv
+clojure.data.csv
+========================================
 
-`data.csv` is a Clojure library for reading and writing comma
-separated value (csv) files. It is licensed under the [Eclipse open
-source license](http://www.opensource.org/licenses/eclipse-1.0.php).
-The library has been tested on Clojure versions 1.2, 1.2.1 and
-1.3. API documentation is available at
-[http://clojure.github.com/data.csv](http://clojure.github.com/data.csv).
-Please use [JIRA](http://dev.clojure.org/jira/browse/DCSV) for bug
-reports instead of the GitHub bug tracker. If you want to contribute
-code to the project make sure you have signed the [Contributer
-Agreement](http://clojure.org/contributing).
+CSV reader/writer to/from Clojure data structures.
 
-## Installation
+Follows the [RFC4180](http://tools.ietf.org/html/rfc4180) specification but is more relaxed.
 
-### Using maven
 
-Add 
+
+Releases and Dependency Information
+========================================
+
+Latest stable release: 0.1.0
+
+* [All Released Versions](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.clojure%22%20AND%20a%3A%22data.csv%22)
+
+* [Development Snapshot Versions](https://oss.sonatype.org/index.html#nexus-search;gav~org.clojure~data.csv~~~)
+
+[Leiningen](https://github.com/technomancy/leiningen) dependency information:
+
+    [org.clojure/data.csv "0.1.0"]
+
+[Maven](http://maven.apache.org/) dependency information:
 
     <dependency>
       <groupId>org.clojure</groupId>
@@ -23,13 +28,10 @@ Add
       <version>0.1.0</version>
     </dependency>
 
-to your `pom.xml` file.
 
-### Using leiningen
 
-Add `[org.clojure/data.csv "0.1.0"]` as a dependency to your `project.clj`.
-
-## Usage
+Example Usage
+========================================
 
     (require '[clojure.data.csv :as csv]
              '[clojure.java.io :as io])
@@ -43,3 +45,39 @@ Add `[org.clojure/data.csv "0.1.0"]` as a dependency to your `project.clj`.
                      [["abc" "def"]
                       ["ghi" "jkl"]]))
 
+Refer to the [API documentation](http://clojure.github.com/data.csv/)
+for additional information.
+
+
+
+Developer Information
+========================================
+
+* [GitHub project](https://github.com/clojure/data.csv)
+
+* [Bug Tracker](http://dev.clojure.org/jira/browse/DCSV)
+
+* [Continuous Integration](http://build.clojure.org/job/data.csv/)
+
+* [Compatibility Test Matrix](http://build.clojure.org/job/data.csv-test-matrix/)
+
+
+
+Change Log
+====================
+
+* Release 0.1.0 on 2011-08-26
+  * Initial release.
+
+
+
+Copyright and License
+========================================
+
+Copyright (c) Jonas Enlund, 2012. All rights reserved.  The use and
+distribution terms for this software are covered by the Eclipse Public
+License 1.0 (http://opensource.org/licenses/eclipse-1.0.php) which can
+be found in the file epl-v10.html at the root of this distribution.
+By using this software in any fashion, you are agreeing to be bound by
+the terms of this license.  You must not remove this notice, or any
+other, from this software.
