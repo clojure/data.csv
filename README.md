@@ -10,7 +10,7 @@ Follows the [RFC4180](http://tools.ietf.org/html/rfc4180) specification but is m
 Releases and Dependency Information
 ========================================
 
-Latest stable release: 0.1.0
+Latest stable release: 0.1.1
 
 * [All Released Versions](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.clojure%22%20AND%20a%3A%22data.csv%22)
 
@@ -18,14 +18,14 @@ Latest stable release: 0.1.0
 
 [Leiningen](https://github.com/technomancy/leiningen) dependency information:
 
-    [org.clojure/data.csv "0.1.0"]
+    [org.clojure/data.csv "0.1.1"]
 
 [Maven](http://maven.apache.org/) dependency information:
 
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>data.csv</artifactId>
-      <version>0.1.0</version>
+      <version>0.1.1</version>
     </dependency>
 
 
@@ -65,6 +65,10 @@ Developer Information
 
 Change Log
 ====================
+
+* Release 0.1.1 on 2012-02-14
+  * Added qoute? keyword param to write-csv
+  * Code cleanup
 
 * Release 0.1.0 on 2011-08-26
   * Initial release.
