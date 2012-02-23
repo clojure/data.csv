@@ -129,7 +129,7 @@
      :guote? (A predicate function which determines if a string should be quoted. Defaults to quoting only when necessary.)
      :newline (:lf (default) or :cr+lf)"
   [writer data & options]
-  (let [opts (into {} options)
+  (let [opts (apply hash-map options)
         separator (or (:separator opts) \,)
         quote (or (:quote opts) \")
         quote? (or (:quote? opts) #(some #{separator quote \return \newline} %))
