@@ -52,5 +52,11 @@ air, moon roof, loaded\",4799.00")
 
 (deftest throw-if-quoted-on-eof
   (let [s "ab,\"de,gh\nij,kl,mn"]
-    (is (thrown? RuntimeException (doall (read-csv s))))))
+    (try
+      (doall (read-csv s))
+      (is false "No exception thrown")
+      (catch Exception e
+        (is (or (instance? java.io.EOFException e)
+                (and (instance? RuntimeException e)
+                     (instance? java.io.EOFException (.getCause e)))))))))
 
