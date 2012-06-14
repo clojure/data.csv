@@ -126,7 +126,7 @@
    Valid options are
      :separator (Default \\,)
      :quote (Default \\\")
-     :guote? (A predicate function which determines if a string should be quoted. Defaults to quoting only when necessary.)
+     :quote? (A predicate function which determines if a string should be quoted. Defaults to quoting only when necessary.)
      :newline (:lf (default) or :cr+lf)"
   [writer data & options]
   (let [opts (apply hash-map options)

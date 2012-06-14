@@ -70,7 +70,7 @@ Change Log
   * Fixed keyword params for `write-csv`
 
 * Release 0.1.1 on 2012-02-14
-  * Added qoute? keyword param to write-csv
+  * Added quote? keyword param to write-csv
   * Code cleanup
 
 * Release 0.1.0 on 2011-08-26
