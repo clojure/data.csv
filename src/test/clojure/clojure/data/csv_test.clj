@@ -24,6 +24,12 @@
 1996,Jeep,Grand Cherokee,\"MUST SELL!
 air, moon roof, loaded\",4799.00")
 
+(def ^{:private true} trickyNL
+  "1997,Ford,E350,\"ac, abs, moon\",3000.00|1999,Chevy,\"Venture \"\"Extended
+  Edition\"\"\",\"\",4900.00|1999,Chevy,\"Venture \"\"Extended
+  Edition, Very Large\"\"\",\"\",5000.00|1996,Jeep,Grand Cherokee,\"MUST SELL!
+air, moon roof, loaded\",4799.00")
+
 (deftest reading
   (let [csv (read-csv simple)]
     (is (= (count csv) 3))
@@ -42,6 +48,17 @@ air, moon roof, loaded\",4799.00")
            ["1997" "Ford" "E350" "ac, abs, moon" "3000.00"]))
     (is (= (last csv)
            ["1996" "Jeep" "Grand Cherokee", "MUST SELL!\nair, moon roof, loaded" "4799.00"]))))
+
+
+(deftest reading-tricky-nl
+  (let [csv (read-csv trickyNL :lf \|)]
+    (is (= (count csv) 4))
+    (is (= (count (first csv)) 5))
+    (is (= (first csv)
+           ["1997" "Ford" "E350" "ac, abs, moon" "3000.00"]))
+    (is (= (last csv)
+           ["1996" "Jeep" "Grand Cherokee", "MUST SELL!\nair, moon roof, loaded" "4799.00"]))
+    ))
         
 
 (deftest reading-and-writing
