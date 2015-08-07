@@ -10,7 +10,7 @@
       :doc "Reading and writing comma separated values."}
   clojure.data.csv
   (:require (clojure [string :as str]))
-  (:import (java.io Reader Writer StringReader EOFException)))
+  (:import (java.io PushbackReader Reader Writer StringReader EOFException)))
 
 ;(set! *warn-on-reflection* true)
 
@@ -29,9 +29,10 @@
                           (recur (.read reader)))
                 sep :sep
                 lf  :eol
-                cr  (if (== (.read reader) lf)
-                      :eol
-                      (throw (Exception. ^String (format "CSV error (unexpected character: %c)" next-ch))))
+                cr  (let [next-next-ch (.read reader)]
+                      (when (not= next-next-ch lf)
+                        (.unread reader next-next-ch))
+                      :eol)
                 eof :eof
                 (throw (Exception. ^String (format "CSV error (unexpected character: %c)" next-ch)))))
       eof (throw (EOFException. "CSV error (unexpected end of file)"))
@@ -47,10 +48,9 @@
           sep :sep
           lf  :eol
           cr (let [next-ch (.read reader)]
-               (if (== next-ch lf)
-                 :eol
-                 (do (.append sb \return)
-                     (recur next-ch))))
+               (when (not= next-ch lf)
+                 (.unread reader next-ch))
+               :eol)
           eof :eof
           (do (.append sb (char ch))
               (recur (.read reader))))))))
@@ -69,9 +69,13 @@
 (extend-protocol Read-CSV-From
   String
   (read-csv-from [s sep quote]
-    (read-csv-from (StringReader. s) sep quote))
+    (read-csv-from (PushbackReader. (StringReader. s)) sep quote))
   
   Reader
+  (read-csv-from [reader sep quote]
+    (read-csv-from (PushbackReader. reader) sep quote))
+  
+  PushbackReader
   (read-csv-from [reader sep quote] 
     (lazy-seq
      (let [[record sentinel] (read-record reader sep quote)]

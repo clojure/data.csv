@@ -60,3 +60,20 @@ air, moon roof, loaded\",4799.00")
                 (and (instance? RuntimeException e)
                      (instance? java.io.EOFException (.getCause e)))))))))
 
+(deftest parse-line-endings
+  (let [csv (read-csv "Year,Make,Model\n1997,Ford,E350")]
+    (is (= 2 (count csv)))
+    (is (= ["Year" "Make" "Model"] (first csv)))
+    (is (= ["1997" "Ford" "E350"] (second csv))))
+  (let [csv (read-csv "Year,Make,Model\r\n1997,Ford,E350")]
+    (is (= 2 (count csv)))
+    (is (= ["Year" "Make" "Model"] (first csv)))
+    (is (= ["1997" "Ford" "E350"] (second csv))))
+  (let [csv (read-csv "Year,Make,Model\r1997,Ford,E350")]
+    (is (= 2 (count csv)))
+    (is (= ["Year" "Make" "Model"] (first csv)))
+    (is (= ["1997" "Ford" "E350"] (second csv))))
+  (let [csv (read-csv "Year,Make,\"Model\"\r1997,Ford,E350")]
+    (is (= 2 (count csv)))
+    (is (= ["Year" "Make" "Model"] (first csv)))
+    (is (= ["1997" "Ford" "E350"] (second csv)))))
