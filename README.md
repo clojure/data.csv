@@ -18,36 +18,41 @@ Latest stable release: 0.1.3
 
 [Leiningen](https://github.com/technomancy/leiningen) dependency information:
 
-    [org.clojure/data.csv "0.1.3"]
+```clj
+[org.clojure/data.csv "0.1.3"]
+```
 
 [Maven](http://maven.apache.org/) dependency information:
 
-    <dependency>
-      <groupId>org.clojure</groupId>
-      <artifactId>data.csv</artifactId>
-      <version>0.1.3</version>
-    </dependency>
+```xml
+<dependency>
+  <groupId>org.clojure</groupId>
+  <artifactId>data.csv</artifactId>
+  <version>0.1.3</version>
+</dependency>
+```
 
 
 
 Example Usage
 ========================================
 
-    (require '[clojure.data.csv :as csv]
-             '[clojure.java.io :as io])
+```clj
+(require '[clojure.data.csv :as csv]
+         '[clojure.java.io :as io])
 
-    (with-open [in-file (io/reader "in-file.csv")]
-      (doall
-        (csv/read-csv in-file)))
+(with-open [in-file (io/reader "in-file.csv")]
+  (doall
+    (csv/read-csv in-file)))
 
-    (with-open [out-file (io/writer "out-file.csv")]
-      (csv/write-csv out-file
-                     [["abc" "def"]
-                      ["ghi" "jkl"]]))
+(with-open [out-file (io/writer "out-file.csv")]
+  (csv/write-csv out-file
+                 [["abc" "def"]
+                  ["ghi" "jkl"]]))
+```
 
 Refer to the [API documentation](http://clojure.github.com/data.csv/)
 for additional information.
-
 
 
 Developer Information
