@@ -20,7 +20,7 @@
 (def ^{:private true} cr  (int \return))
 (def ^{:private true} eof -1)
 
-(defn- read-quoted-cell [^Reader reader ^StringBuilder sb sep quote]
+(defn- read-quoted-cell [^PushbackReader reader ^StringBuilder sb sep quote]
   (loop [ch (.read reader)]
     (condp == ch
       quote (let [next-ch (.read reader)]
@@ -39,7 +39,7 @@
       (do (.append sb (char ch))
           (recur (.read reader))))))
 
-(defn- read-cell [^Reader reader ^StringBuilder sb sep quote]
+(defn- read-cell [^PushbackReader reader ^StringBuilder sb sep quote]
   (let [first-ch (.read reader)]
     (if (== first-ch quote)
       (read-quoted-cell reader sb sep quote)
