@@ -1,6 +1,8 @@
 clojure.data.csv
 ========================================
 
+[*API documentation*](http://clojure.github.com/data.csv/)
+
 CSV reader/writer to/from Clojure data structures.
 
 Follows the [RFC4180](http://tools.ietf.org/html/rfc4180) specification but is more relaxed.
@@ -47,6 +49,177 @@ Example Usage
 
 Refer to the [API documentation](http://clojure.github.com/data.csv/)
 for additional information.
+
+## Working with data.csv
+
+This library is meant to remain small and focus on nothing but correctly parsing
+csv files. The following sections describes how to effectively use data.csv as a
+building block in larger programs as well as some hints on how to solve common
+problems.
+
+### Laziness
+
+When parsing a csv file with data.csv the result is a lazy sequence of vectors
+of strings. With some care, laziness makes it possible to process very large csv
+files without excessive memory use. Here's an example of a program that copies
+one csv file to another but drops the first and last columns:
+
+```clojure
+(defn copy-csv [from to]
+  (with-open [reader (io/reader from)
+              writer (io/writer to)]
+    (->> (read-csv reader)
+         (map #(rest (butlast %)))
+         (write-csv writer))))
+```
+
+This function will work even if the csv file is larger than would fit in memory
+because all the steps are lazy.
+
+There are a few things to look out for when dealing with lazy
+sequences. Espacially with data.csv where the sequence is often created via a
+`clojure.java.io/reader` that could already be closed when the lazy sequence is
+consumed. For example
+
+```clojure
+(defn read-column [filename column-index]
+  (with-open [reader (io/reader filename)]
+    (let [data (read-csv reader)]
+      (map #(nth % column-index) data))))
+
+(defn sum-second-column [filename]
+  (->> (read-column filename 1)
+       (drop 1) ;; Drop header column
+       (map #(Double/parseDouble %))
+       (reduce + 0)))
+```
+
+This program will throw the exception "`java.io.Exception`: Stream Closed". The
+reason is that both `read-csv` and `map` are lazy, so `read-column` will
+immeditaly return a sequence without actually reading any bytes from the
+file. The reading (and parsing) will happen when data is needed by the calling
+code (`reduce` in this case). By the time `reduce` tries to add the first value
+`with-open` will already have closed the `io/reader` and the exception is
+thrown.
+
+There are two solutions to this problem:
+
+1. Move the opening/closing of the reader up the callstack to the point where
+   the content is consumed:
+
+```clojure
+(defn read-column [reader column-index]
+  (let [data (read-csv reader)]
+    (map #(nth % column-index) data)))
+
+(defn sum-second-column [filename]
+  (with-open [reader (io/reader filename)]
+    (->> (read-column reader 1)
+         (drop 1)
+         (map #(Double/parseDouble %))
+         (reduce + 0))))
+```
+
+2. Don't return a lazy sequence
+
+```clojure
+(defn read-column [filename column-index]
+  (with-open [reader (io/reader filename)]
+    (let [data (read-csv reader)]
+      ;; mapv is not lazy, so the csv data will be consumed at this point
+      (mapv #(nth % column-index) data))))
+
+(defn sum-second-column [filename]
+  (->> (read-column filename 1)
+       (drop 1)
+       (map #(Double/parseDouble %))
+       (reduce + 0)))
+```
+
+Which approach to choose depends on the application. If the csv file isn't huge
+the second approach will often work well. If you want to be careful not to read
+the csv file into memory the first approach is preferable.
+
+### Parsing into maps
+
+Data.csv parses lines of a csv file into a vector of strings. This is often not
+the desired output where you might want the result to be a sequence of maps
+instead, such as
+
+```text
+foo,bar,baz
+A,1,x
+B,2,y
+C,3,z
+```
+
+```clojure
+({:foo "A"
+  :bar "2"
+  :baz "x"}
+ {:foo "B"
+  :bar "2"
+  :baz "y"}
+ {:foo "C"
+  :bar "3"
+  :baz "z"})
+```
+
+One fairly elegant way to achieve this is the expression
+
+```clojure
+(defn csv-data->maps [csv-data]
+  (map zipmap
+       (->> (first csv-data) ;; First row is the header
+            (map keyword) ;; Drop if you want string keys instead
+            repeat)
+	  (rest csv-data)))
+
+(csv-data->maps (read-csv reader))
+```
+
+This function is lazy so all the options described in the previous section is
+still valid.  Now that the data is in a nice format it's easy to do any desired
+post-processing:
+
+```clojure
+(->> (read-csv reader)
+     csv-data->maps
+     (map (fn [csv-record]
+            (update csv-record :bar #(Long/parseLong %)))))
+
+({:foo "A"
+  :bar 1
+  :baz "x"}
+ {:foo "B"
+  :bar 2
+  :baz "y"}
+ {:foo "C"
+  :bar 3
+  :baz "z"})
+```
+
+### Byte Order Mark
+
+A [byte order mark (BOM)](https://en.wikipedia.org/wiki/Byte_order_mark) is a
+byte sequence that appears as the first couple of bytes in some CSV files (and
+other text files). Data.csv will not automatically remove these extra bytes so
+they can accidentally be interpreted as part of the first cells characters. If
+you want to avoid this you can either try to manually detect it by looking at
+the first byte(s) and calling `(.skip reader 1)` before you pass the reader to
+read-csv.
+
+Another option is to create the reader in such a way that the BOM will be
+automatically removed. One way to achieve this is to use
+[`org.apache.commons.io.input/BOMInputStream`](https://commons.apache.org/proper/commons-io/javadocs/api-release/org/apache/commons/io/input/BOMInputStream.html):
+
+```clojure
+(with-open [reader (-> "data.csv"
+                       io/input-stream
+                       BOMInputStream.
+                       io/reader)]
+  (doall (read-csv reader)))
+```
 
 
 
