@@ -35,17 +35,19 @@ Latest stable release: 0.1.4
 Example Usage
 ========================================
 
-    (require '[clojure.data.csv :as csv]
-             '[clojure.java.io :as io])
+```clojure
+(require '[clojure.data.csv :as csv]
+         '[clojure.java.io :as io])
 
-    (with-open [in-file (io/reader "in-file.csv")]
-      (doall
-        (csv/read-csv in-file)))
+(with-open [reader (io/reader "in-file.csv")]
+  (doall
+    (csv/read-csv reader)))
 
-    (with-open [out-file (io/writer "out-file.csv")]
-      (csv/write-csv out-file
-                     [["abc" "def"]
-                      ["ghi" "jkl"]]))
+(with-open [writer (io/writer "out-file.csv")]
+  (csv/write-csv writer
+                 [["abc" "def"]
+                  ["ghi" "jkl"]]))
+```
 
 Refer to the [API documentation](http://clojure.github.com/data.csv/)
 for additional information.
