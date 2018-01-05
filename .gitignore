@@ -3,3 +3,4 @@ target/
 resources/
 lib/
 *.jar
+.cpcache/
