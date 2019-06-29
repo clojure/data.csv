@@ -127,7 +127,8 @@ air, moon roof, loaded\",4799.00")
 
 
 (deftest rows->maps-tests
-  (let [expected [{:foo "A"
+  (let [sample "foo,bar,baz\nA,1,x\nB,2,y\nC,3,z"
+        expected [{:foo "A"
                    :bar "1"
                    :baz "x"}
                   {:foo "B"
@@ -138,19 +139,18 @@ air, moon roof, loaded\",4799.00")
                    :baz "z"}]]
     (testing "lazy version"
       (time
-        (let [sample "foo,bar,baz\nA,1,x\nB,2,y\nC,3,z"
-              csv (read-csv sample)]
+        (let [csv (read-csv sample)]
           (is (= expected (rows->maps csv))))))
 
     (testing "eager version"
       (time
-        (let [sample "A,1,x\nB,2,y\nC,3,z"
-              lines (lines-reducible
+        (let [lines (lines-reducible
                       (reader (StringReader. sample)))
               headers ["foo" "bar" "baz"]]
           (is (= expected
                  (into []
-                       (rows->maps-xform headers)
+                       (comp (drop 1)
+                             (rows->maps-xform headers))
                        (read-csv lines))))))
       )
     )
