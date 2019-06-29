@@ -1,8 +1,8 @@
 (ns clojure.data.csv-test
   (:use
     [clojure.java.io :only (reader)]
-    [clojure.test :only (deftest is)]
-    [clojure.data.csv :only (read-csv write-csv lines-reducible)])
+    [clojure.test :only (deftest is testing)]
+    [clojure.data.csv :only (read-csv write-csv lines-reducible rows->maps rows->maps-xform)])
   (:require [clojure.string :as str])
   (:import
     [java.io Reader StringReader StringWriter EOFException]))
@@ -26,7 +26,7 @@
 1996,Jeep,Grand Cherokee,\"MUST SELL!
 air, moon roof, loaded\",4799.00")
 
-(def ^{:private true} complicated-no-newlines
+(def ^{:private true} complicated-no-newlines ;; for testing reducible input
   "1997,Ford,E350,\"ac, abs, moon\",3000.00
 1999,Chevy,\"Venture \"\"Extended Edition\"\"\",\"\",4900.00
 1999,Chevy,\"Venture \"\"Extended Edition, Very Large\"\"\",\"\",5000.00
@@ -88,14 +88,6 @@ air, moon roof, loaded\",4799.00")
                ["1996" "jeep" "grand cherokee", "must sell!,air, moon roof, loaded" "4799.00"])))
 
       ))
-
-
-
-
-
-
-
-
   )
         
 
@@ -132,3 +124,39 @@ air, moon roof, loaded\",4799.00")
     (is (= 2 (count csv)))
     (is (= ["Year" "Make" "Model"] (first csv)))
     (is (= ["1997" "Ford" "E350"] (second csv)))))
+
+
+(deftest rows->maps-tests
+  (let [expected [{:foo "A"
+                   :bar "1"
+                   :baz "x"}
+                  {:foo "B"
+                   :bar "2"
+                   :baz "y"}
+                  {:foo "C"
+                   :bar "3"
+                   :baz "z"}]]
+    (testing "lazy version"
+      (time
+        (let [sample "foo,bar,baz\nA,1,x\nB,2,y\nC,3,z"
+              csv (read-csv sample)]
+          (is (= expected (rows->maps csv))))))
+
+    (testing "eager version"
+      (time
+        (let [sample "A,1,x\nB,2,y\nC,3,z"
+              lines (lines-reducible
+                      (reader (StringReader. sample)))
+              headers ["foo" "bar" "baz"]]
+          (is (= expected
+                 (read-csv lines :xform (rows->maps-xform headers))))))
+      )
+    )
+
+
+
+
+
+
+
+  )

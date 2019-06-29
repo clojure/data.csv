@@ -90,15 +90,16 @@
     (let [qstr (str (char quote))
           sep-str (str (char sep))]
       (into []
-            (comp (map (fn [^String line]
-                         (if (.contains line qstr)
-                           (-> line
-                               StringReader.
-                               PushbackReader.
-                               (read-record sep quote)
-                               first)
-                           (vec (.split line sep-str)))))
-                  xform)
+            (comp
+              (map (fn [^String line]
+                     (if (.contains line qstr) ;; contains quoted cell
+                       (-> line
+                           StringReader.
+                           PushbackReader.
+                           (read-record sep quote)
+                           first)
+                       (vec (.split line sep-str)))))
+              xform)
             lines)))
   )
 
@@ -184,3 +185,29 @@
               (recur (f state line))
               state)))))))
 
+(defn- row->map
+  [header row]
+  (zipmap header row))
+
+(defn rows->maps
+  "Assumes first row is the header.
+   To be used against lazy-seqs."
+  ([csv-data]
+   (rows->maps csv-data true))
+  ([csv-data kw?]
+   (map
+     (partial row->map (cond->> (first csv-data)
+                                kw? (map keyword)))
+     (rest csv-data))))
+
+(defn rows->maps-xform
+  "Transducer version of `rows->maps`.
+   Assumes no headers in the actual data,
+   hence expected as the first argument."
+  ([headers]
+   (rows->maps-xform headers true))
+  ([headers kw?]
+   (map
+     (partial row->map
+              (cond->> headers
+                       kw? (map keyword))))))
