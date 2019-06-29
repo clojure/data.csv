@@ -10,7 +10,8 @@
       :doc "Reading and writing comma separated values."}
   clojure.data.csv
   (:require (clojure [string :as str]))
-  (:import (java.io PushbackReader Reader Writer StringReader EOFException)))
+  (:import (java.io PushbackReader Reader Writer StringReader EOFException BufferedReader)
+           (clojure.lang IReduceInit)))
 
 ;(set! *warn-on-reflection* true)
 
@@ -64,36 +65,61 @@
         [(persistent! (conj! record (str cell))) sentinel]))))
 
 (defprotocol Read-CSV-From
-  (read-csv-from [input sep quote]))
+  (read-csv-from [input sep quote xform]))
 
 (extend-protocol Read-CSV-From
   String
-  (read-csv-from [s sep quote]
-    (read-csv-from (PushbackReader. (StringReader. s)) sep quote))
+  (read-csv-from [s sep quote _]
+    (read-csv-from (PushbackReader. (StringReader. s)) sep quote _))
   
   Reader
-  (read-csv-from [reader sep quote]
-    (read-csv-from (PushbackReader. reader) sep quote))
+  (read-csv-from [reader sep quote _]
+    (read-csv-from (PushbackReader. reader) sep quote _))
   
   PushbackReader
-  (read-csv-from [reader sep quote] 
+  (read-csv-from [reader sep quote _]
     (lazy-seq
      (let [[record sentinel] (read-record reader sep quote)]
        (case sentinel
-	 :eol (cons record (read-csv-from reader sep quote))
+	 :eol (cons record (read-csv-from reader sep quote _))
 	 :eof (when-not (= record [""])
-		(cons record nil)))))))
+		(cons record nil))))))
+
+  IReduceInit ;; can't deal with newlines in cells through this path :(
+  (read-csv-from [lines sep quote xform]
+    (let [qstr (str (char quote))
+          sep-str (str (char sep))]
+      (into []
+            (comp (map (fn [^String line]
+                         (if (.contains line qstr)
+                           (-> line
+                               StringReader.
+                               PushbackReader.
+                               (read-record sep quote)
+                               first)
+                           (vec (.split line sep-str)))))
+                  xform)
+            lines)))
+  )
 
 (defn read-csv
-  "Reads CSV-data from input (String or java.io.Reader) into a lazy
-  sequence of vectors.
+  "Reads CSV-data from input (String, java.io.Reader or something reducible)
+   into a sequence of vectors. For non-reducible inputs the sequence will be
+   lazily computed, whereas for reducible ones it will be eager and
+   transducer-friendly (via the optional `xform` param).
+
+   ATTENTION: newlines in quoted cells of reducible inputs are NOT supported!
 
    Valid options are
      :separator (default \\,)
-     :quote (default \\\")"
+     :quote (default \\\")
+     :xform (for reducible inputs only)"
   [input & options]
-  (let [{:keys [separator quote] :or {separator \, quote \"}} options]
-    (read-csv-from input (int separator) (int quote))))
+  (let [{:keys [separator quote xform]
+         :or {separator \,
+              quote \"
+              xform (map identity)}} options]
+    (read-csv-from input (int separator) (int quote) xform)))
 
 
 ;; Writing
@@ -144,3 +170,16 @@
 		quote
                 quote?
 		({:lf "\n" :cr+lf "\r\n"} newline))))
+
+(defn lines-reducible
+  [^BufferedReader rdr]
+  (reify IReduceInit
+    (reduce [ this f init]
+      (with-open [r rdr]
+        (loop [state init]
+          (if (reduced? state)
+            @state
+            (if-let [line (.readLine rdr)]
+              (recur (f state line))
+              state)))))))
+

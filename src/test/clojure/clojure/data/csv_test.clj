@@ -1,9 +1,11 @@
 (ns clojure.data.csv-test
   (:use
-   [clojure.test :only (deftest is)]
-   [clojure.data.csv :only (read-csv write-csv)])
+    [clojure.java.io :only (reader)]
+    [clojure.test :only (deftest is)]
+    [clojure.data.csv :only (read-csv write-csv lines-reducible)])
+  (:require [clojure.string :as str])
   (:import
-   [java.io Reader StringReader StringWriter EOFException]))
+    [java.io Reader StringReader StringWriter EOFException]))
 
 (def ^{:private true} simple
   "Year,Make,Model
@@ -24,24 +26,77 @@
 1996,Jeep,Grand Cherokee,\"MUST SELL!
 air, moon roof, loaded\",4799.00")
 
+(def ^{:private true} complicated-no-newlines
+  "1997,Ford,E350,\"ac, abs, moon\",3000.00
+1999,Chevy,\"Venture \"\"Extended Edition\"\"\",\"\",4900.00
+1999,Chevy,\"Venture \"\"Extended Edition, Very Large\"\"\",\"\",5000.00
+1996,Jeep,Grand Cherokee,\"MUST SELL!,air, moon roof, loaded\",4799.00")
+
 (deftest reading
-  (let [csv (read-csv simple)]
-    (is (= (count csv) 3))
-    (is (= (count (first csv)) 3))
-    (is (= (first csv) ["Year" "Make" "Model"]))
-    (is (= (last csv) ["2000" "Mercury" "Cougar"])))
-  (let [csv (read-csv simple-alt-sep :separator \;)]
-    (is (= (count csv) 3))
-    (is (= (count (first csv)) 3))
-    (is (= (first csv) ["Year" "Make" "Model"]))
-    (is (= (last csv) ["2000" "Mercury" "Cougar"])))
-  (let [csv (read-csv complicated)]
-    (is (= (count csv) 4))
-    (is (= (count (first csv)) 5))
-    (is (= (first csv)
-           ["1997" "Ford" "E350" "ac, abs, moon" "3000.00"]))
-    (is (= (last csv)
-           ["1996" "Jeep" "Grand Cherokee", "MUST SELL!\nair, moon roof, loaded" "4799.00"]))))
+  (time
+    (do
+      (let [csv (read-csv simple)]
+        (is (= (count csv) 3))
+        (is (= (count (first csv)) 3))
+        (is (= (first csv) ["Year" "Make" "Model"]))
+        (is (= (last csv) ["2000" "Mercury" "Cougar"])))
+      (let [csv (read-csv simple-alt-sep :separator \;)]
+        (is (= (count csv) 3))
+        (is (= (count (first csv)) 3))
+        (is (= (first csv) ["Year" "Make" "Model"]))
+        (is (= (last csv) ["2000" "Mercury" "Cougar"])))
+      (let [csv (read-csv complicated)]
+        (is (= (count csv) 4))
+        (is (= (count (first csv)) 5))
+        (is (= (first csv)
+               ["1997" "Ford" "E350" "ac, abs, moon" "3000.00"]))
+        (is (= (last csv)
+               ["1996" "Jeep" "Grand Cherokee", "MUST SELL!\nair, moon roof, loaded" "4799.00"]))))))
+
+
+(deftest reading-eager
+  (time ;; 30% faster even though it does more work!
+    (let [uncapitalize (partial map str/lower-case)]
+
+      (let [lines (lines-reducible
+                    (reader (StringReader. simple)))
+            csv (read-csv lines :xform (map uncapitalize))]
+        (is (= (count csv) 3))
+        (is (= (count (first csv)) 3))
+        (is (= (first csv) ["year" "make" "model"]))
+        (is (= (last csv) ["2000" "mercury" "cougar"])))
+
+      (let [lines (lines-reducible
+                    (reader (StringReader. simple-alt-sep)))
+            csv (read-csv lines
+                          :separator \;
+                          :xform (map uncapitalize))]
+        (is (= (count csv) 3))
+        (is (= (count (first csv)) 3))
+        (is (= (first csv) ["year" "make" "model"]))
+        (is (= (last csv) ["2000" "mercury" "cougar"])))
+
+      ;; can't deal with newlines through this path :(
+      (let [lines (lines-reducible
+                    (reader (StringReader. complicated-no-newlines)))
+            csv (read-csv lines :xform (map uncapitalize))]
+        (is (= (count csv) 4))
+        (is (= (count (first csv)) 5))
+        (is (= (first csv)
+               ["1997" "ford" "e350" "ac, abs, moon" "3000.00"]))
+        (is (= (last csv)
+               ["1996" "jeep" "grand cherokee", "must sell!,air, moon roof, loaded" "4799.00"])))
+
+      ))
+
+
+
+
+
+
+
+
+  )
         
 
 (deftest reading-and-writing
