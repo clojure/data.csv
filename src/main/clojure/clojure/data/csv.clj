@@ -172,14 +172,15 @@
 		({:lf "\n" :cr+lf "\r\n"} newline))))
 
 (defn lines-reducible
+  "A reducible alternative to `line-seq`."
   [^BufferedReader rdr]
   (reify IReduceInit
-    (reduce [ this f init]
+    (reduce [this f init]
       (with-open [r rdr]
         (loop [state init]
           (if (reduced? state)
             @state
-            (if-let [line (.readLine rdr)]
+            (if-let [line (.readLine r)]
               (recur (f state line))
               state)))))))
 
