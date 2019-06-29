@@ -60,7 +60,7 @@ air, moon roof, loaded\",4799.00")
 
       (let [lines (lines-reducible
                     (reader (StringReader. simple)))
-            csv (read-csv lines :xform (map uncapitalize))]
+            csv (into [] (map uncapitalize) (read-csv lines))]
         (is (= (count csv) 3))
         (is (= (count (first csv)) 3))
         (is (= (first csv) ["year" "make" "model"]))
@@ -68,9 +68,9 @@ air, moon roof, loaded\",4799.00")
 
       (let [lines (lines-reducible
                     (reader (StringReader. simple-alt-sep)))
-            csv (read-csv lines
-                          :separator \;
-                          :xform (map uncapitalize))]
+            csv (into []
+                      (map uncapitalize)
+                      (read-csv lines :separator \;))]
         (is (= (count csv) 3))
         (is (= (count (first csv)) 3))
         (is (= (first csv) ["year" "make" "model"]))
@@ -79,7 +79,7 @@ air, moon roof, loaded\",4799.00")
       ;; can't deal with newlines through this path :(
       (let [lines (lines-reducible
                     (reader (StringReader. complicated-no-newlines)))
-            csv (read-csv lines :xform (map uncapitalize))]
+            csv (into [] (map uncapitalize) (read-csv lines))]
         (is (= (count csv) 4))
         (is (= (count (first csv)) 5))
         (is (= (first csv)
@@ -149,7 +149,9 @@ air, moon roof, loaded\",4799.00")
                       (reader (StringReader. sample)))
               headers ["foo" "bar" "baz"]]
           (is (= expected
-                 (read-csv lines :xform (rows->maps-xform headers))))))
+                 (into []
+                       (rows->maps-xform headers)
+                       (read-csv lines))))))
       )
     )
 

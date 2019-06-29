@@ -65,62 +65,58 @@
         [(persistent! (conj! record (str cell))) sentinel]))))
 
 (defprotocol Read-CSV-From
-  (read-csv-from [input sep quote xform]))
+  (read-csv-from [input sep quote]))
 
 (extend-protocol Read-CSV-From
   String
-  (read-csv-from [s sep quote _]
-    (read-csv-from (PushbackReader. (StringReader. s)) sep quote _))
+  (read-csv-from [s sep quote]
+    (read-csv-from (PushbackReader. (StringReader. s)) sep quote))
   
   Reader
-  (read-csv-from [reader sep quote _]
-    (read-csv-from (PushbackReader. reader) sep quote _))
+  (read-csv-from [reader sep quote]
+    (read-csv-from (PushbackReader. reader) sep quote))
   
   PushbackReader
-  (read-csv-from [reader sep quote _]
+  (read-csv-from [reader sep quote]
     (lazy-seq
      (let [[record sentinel] (read-record reader sep quote)]
        (case sentinel
-	 :eol (cons record (read-csv-from reader sep quote _))
+	 :eol (cons record (read-csv-from reader sep quote))
 	 :eof (when-not (= record [""])
 		(cons record nil))))))
 
-  IReduceInit ;; can't deal with newlines in cells through this path :(
-  (read-csv-from [lines sep quote xform]
+  IReduceInit ;; can't deal with newlines in quoted cells down this path :(
+  (read-csv-from [lines sep quote]
     (let [qstr (str (char quote))
           sep-str (str (char sep))]
-      (into []
-            (comp
-              (map (fn [^String line]
-                     (if (.contains line qstr) ;; contains quoted cell
-                       (-> line
-                           StringReader.
-                           PushbackReader.
-                           (read-record sep quote)
-                           first)
-                       (vec (.split line sep-str)))))
-              xform)
-            lines)))
+      (eduction ;; allow the caller to reduce/transduce however he wants
+        (map (fn [^String line]
+               (if (.contains line qstr) ;; contains quoted cell
+                 (-> line
+                     StringReader.
+                     PushbackReader.
+                     (read-record sep quote)
+                     first)
+                 (vec (.split line sep-str)))))
+        lines)))
   )
 
 (defn read-csv
   "Reads CSV-data from input (String, java.io.Reader or something reducible)
    into a sequence of vectors. For non-reducible inputs the sequence will be
-   lazily computed, whereas for reducible ones it will be eager and
-   transducer-friendly (via the optional `xform` param).
+   lazily computed, whereas for reducible ones it will be transducer-friendly
+   (returns an `eduction`).
 
    ATTENTION: newlines in quoted cells of reducible inputs are NOT supported!
 
    Valid options are
      :separator (default \\,)
-     :quote (default \\\")
-     :xform (for reducible inputs only)"
+     :quote (default \\\")"
   [input & options]
-  (let [{:keys [separator quote xform]
+  (let [{:keys [separator quote]
          :or {separator \,
-              quote \"
-              xform (map identity)}} options]
-    (read-csv-from input (int separator) (int quote) xform)))
+              quote \"}} options]
+    (read-csv-from input (int separator) (int quote))))
 
 
 ;; Writing
