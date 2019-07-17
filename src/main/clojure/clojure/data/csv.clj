@@ -10,7 +10,7 @@
       :doc "Reading and writing comma separated values."}
   clojure.data.csv
   (:require (clojure [string :as str]))
-  (:import (java.io PushbackReader Reader Writer StringReader EOFException)))
+  (:import (java.io PushbackReader Reader Writer StringReader EOFException StringWriter)))
 
 ;(set! *warn-on-reflection* true)
 
@@ -120,8 +120,10 @@
   [^Writer writer records sep quote quote? ^String newline]
   (loop [records records]
     (when-first [record records]
-      (write-record writer record sep quote quote?)
-      (.write writer newline)
+      (let [str-writer (StringWriter.)]
+        (write-record str-writer record sep quote quote?)
+        (.write str-writer newline)
+        (.write writer (.toString str-writer)))
       (recur (next records)))))
 
 (defn write-csv

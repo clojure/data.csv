@@ -77,3 +77,12 @@ air, moon roof, loaded\",4799.00")
     (is (= 2 (count csv)))
     (is (= ["Year" "Make" "Model"] (first csv)))
     (is (= ["1997" "Ford" "E350"] (second csv)))))
+
+
+(deftest write-from-multiple-threads
+  (let [string-writer (StringWriter.)
+        futures (mapv #(future (write-csv string-writer [[% %]]))
+                      (range 10))]
+    (mapv deref futures)
+    (is (= (set (read-csv (.toString string-writer)))
+           (set (map (juxt str str) (range 10)))))))
