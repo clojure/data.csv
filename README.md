@@ -12,7 +12,9 @@ Follows the [RFC4180](http://tools.ietf.org/html/rfc4180) specification but is m
 Releases and Dependency Information
 ========================================
 
-Latest stable release: 0.1.4
+This project follows the version scheme MAJOR.MINOR.PATCH where each component provides some relative indication of the size of the change, but does not follow semantic versioning. In general, all changes endeavor to be non-breaking (by moving to new names rather than by breaking existing names).
+
+Latest stable release: 1.0.0
 
 * [All Released Versions](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.clojure%22%20AND%20a%3A%22data.csv%22)
 
@@ -20,14 +22,14 @@ Latest stable release: 0.1.4
 
 [Leiningen](https://github.com/technomancy/leiningen) dependency information:
 
-    [org.clojure/data.csv "0.1.4"]
+    [org.clojure/data.csv "1.0.0"]
 
 [Maven](http://maven.apache.org/) dependency information:
 
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>data.csv</artifactId>
-      <version>0.1.4</version>
+      <version>1.0.0</version>
     </dependency>
 
 
@@ -241,6 +243,8 @@ Developer Information
 Change Log
 ====================
 
+* Release 1.0.0 on 2020-02-18
+
 * Release 0.1.4 on 2017-04-05
   * [DCSV-16](https://dev.clojure.org/jira/browse/DCSV-16) Resolve some reflection warnings
 
@@ -263,7 +267,8 @@ Change Log
 Copyright and License
 ========================================
 
-Copyright (c) Jonas Enlund, 2012. All rights reserved.  The use and
+Copyright (c) Jonas Enlund, Rich Hickey, and contributors, 2012-2020. 
+All rights reserved.  The use and
 distribution terms for this software are covered by the Eclipse Public
 License 1.0 (http://opensource.org/licenses/eclipse-1.0.php) which can
 be found in the file epl-v10.html at the root of this distribution.
