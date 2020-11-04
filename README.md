@@ -164,7 +164,7 @@ C,3,z
 
 ```clojure
 ({:foo "A"
-  :bar "2"
+  :bar "1"
   :baz "x"}
  {:foo "B"
   :bar "2"
