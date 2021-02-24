@@ -1,11 +1,11 @@
 clojure.data.csv
 ========================================
 
-[*API documentation*](http://clojure.github.com/data.csv/)
+[*API documentation*](https://clojure.github.io/data.csv/)
 
 CSV reader/writer to/from Clojure data structures.
 
-Follows the [RFC4180](http://tools.ietf.org/html/rfc4180) specification but is more relaxed.
+Follows the [RFC4180](https://tools.ietf.org/html/rfc4180) specification but is more relaxed.
 
 
 
@@ -56,7 +56,7 @@ Example Usage
                   ["ghi" "jkl"]]))
 ```
 
-Refer to the [API documentation](http://clojure.github.com/data.csv/)
+Refer to the [API documentation](https://clojure.github.io/data.csv/)
 for additional information.
 
 ## Working with data.csv
