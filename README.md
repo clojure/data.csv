@@ -187,7 +187,7 @@ One fairly elegant way to achieve this is the expression
 (csv-data->maps (read-csv reader))
 ```
 
-This function is lazy so all the options described in the previous section is
+This function is lazy so all the options described in the previous section are
 still valid.  Now that the data is in a nice format it's easy to do any desired
 post-processing:
 
