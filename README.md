@@ -27,16 +27,19 @@ org.clojure/data.csv {:mvn/version "1.0.0"}
 
 [Leiningen](https://github.com/technomancy/leiningen) dependency information:
 
+```clojure
     [org.clojure/data.csv "1.0.0"]
+```
 
 [Maven](http://maven.apache.org/) dependency information:
 
+```xml
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>data.csv</artifactId>
       <version>1.0.0</version>
     </dependency>
-
+```
 
 
 Example Usage
