@@ -14,7 +14,7 @@ Releases and Dependency Information
 
 This project follows the version scheme MAJOR.MINOR.PATCH where each component provides some relative indication of the size of the change, but does not follow semantic versioning. In general, all changes endeavor to be non-breaking (by moving to new names rather than by breaking existing names).
 
-Latest stable release: 1.0.0
+Latest stable release: 1.0.1
 
 * [All Released Versions](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.clojure%22%20AND%20a%3A%22data.csv%22)
 
@@ -22,13 +22,13 @@ Latest stable release: 1.0.0
 
 [CLI/`deps.edn`](https://clojure.org/reference/deps_and_cli) dependency information:
 ```clojure
-org.clojure/data.csv {:mvn/version "1.0.0"}
+org.clojure/data.csv {:mvn/version "1.0.1"}
 ```
 
 [Leiningen](https://github.com/technomancy/leiningen) dependency information:
 
 ```clojure
-    [org.clojure/data.csv "1.0.0"]
+    [org.clojure/data.csv "1.0.1"]
 ```
 
 [Maven](http://maven.apache.org/) dependency information:
@@ -37,7 +37,7 @@ org.clojure/data.csv {:mvn/version "1.0.0"}
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>data.csv</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
 ```
 
@@ -251,7 +251,7 @@ Developer Information
 Change Log
 ====================
 
-* next
+* Release 1.0.1 on 2022-04-04
   * Lift construction requiring quote out of the quote? function in write-csv
 
 * Release 1.0.0 on 2020-02-18
