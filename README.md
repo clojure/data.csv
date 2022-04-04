@@ -251,6 +251,9 @@ Developer Information
 Change Log
 ====================
 
+* next
+  * Lift construction requiring quote out of the quote? function in write-csv
+
 * Release 1.0.0 on 2020-02-18
 
 * Release 0.1.4 on 2017-04-05

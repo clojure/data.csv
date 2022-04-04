@@ -136,7 +136,7 @@
   (let [opts (apply hash-map options)
         separator (or (:separator opts) \,)
         quote (or (:quote opts) \")
-        quote? (or (:quote? opts) #(some #{separator quote \return \newline} %))
+        quote? (or (:quote? opts) (let [should-quote #{separator quote \return \newline}] #(some should-quote %)))
         newline (or (:newline opts) :lf)]
     (write-csv* writer
 		data
