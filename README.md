@@ -16,7 +16,7 @@ This project follows the version scheme MAJOR.MINOR.PATCH where each component p
 
 Latest stable release: 1.0.1
 
-* [All Released Versions](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.clojure%22%20AND%20a%3A%22data.csv%22)
+* [All Released Versions](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.clojure%22%20AND%20a%3A%22data.csv%22)
 
 * [Development Snapshot Versions](https://oss.sonatype.org/index.html#nexus-search;gav~org.clojure~data.csv~~~)
 
@@ -80,23 +80,23 @@ one csv file to another but drops the first and last columns:
 (defn copy-csv [from to]
   (with-open [reader (io/reader from)
               writer (io/writer to)]
-    (->> (read-csv reader)
+    (->> (csv/read-csv reader)
          (map #(rest (butlast %)))
-         (write-csv writer))))
+         (csv/write-csv writer))))
 ```
 
 This function will work even if the csv file is larger than would fit in memory
 because all the steps are lazy.
 
 There are a few things to look out for when dealing with lazy
-sequences. Espacially with data.csv where the sequence is often created via a
+sequences. Especially with data.csv where the sequence is often created via a
 `clojure.java.io/reader` that could already be closed when the lazy sequence is
 consumed. For example
 
 ```clojure
 (defn read-column [filename column-index]
   (with-open [reader (io/reader filename)]
-    (let [data (read-csv reader)]
+    (let [data (csv/read-csv reader)]
       (map #(nth % column-index) data))))
 
 (defn sum-second-column [filename]
@@ -121,7 +121,7 @@ There are two solutions to this problem:
 
 ```clojure
 (defn read-column [reader column-index]
-  (let [data (read-csv reader)]
+  (let [data (csv/read-csv reader)]
     (map #(nth % column-index) data)))
 
 (defn sum-second-column [filename]
@@ -137,7 +137,7 @@ There are two solutions to this problem:
 ```clojure
 (defn read-column [filename column-index]
   (with-open [reader (io/reader filename)]
-    (let [data (read-csv reader)]
+    (let [data (csv/read-csv reader)]
       ;; mapv is not lazy, so the csv data will be consumed at this point
       (mapv #(nth % column-index) data))))
 
@@ -187,7 +187,7 @@ One fairly elegant way to achieve this is the expression
             repeat)
 	  (rest csv-data)))
 
-(csv-data->maps (read-csv reader))
+(csv-data->maps (csv/read-csv reader))
 ```
 
 This function is lazy so all the options described in the previous section are
@@ -195,7 +195,7 @@ still valid.  Now that the data is in a nice format it's easy to do any desired
 post-processing:
 
 ```clojure
-(->> (read-csv reader)
+(->> (csv/read-csv reader)
      csv-data->maps
      (map (fn [csv-record]
             (update csv-record :bar #(Long/parseLong %)))))
@@ -230,7 +230,7 @@ automatically removed. One way to achieve this is to use
                        io/input-stream
                        BOMInputStream.
                        io/reader)]
-  (doall (read-csv reader)))
+  (doall (csv/read-csv reader)))
 ```
 
 
@@ -239,13 +239,9 @@ Developer Information
 ========================================
 
 * [GitHub project](https://github.com/clojure/data.csv)
-
-* [Bug Tracker](http://dev.clojure.org/jira/browse/DCSV)
-
-* [Continuous Integration](http://build.clojure.org/job/data.csv/)
-
-* [Compatibility Test Matrix](http://build.clojure.org/job/data.csv-test-matrix/)
-
+* [Bug Tracker](https://clojure.atlassian.net/browse/DCSV)  
+* [Continuous Integration](https://build.clojure.org/job/data.csv/)
+* [Compatibility Test Matrix](https://build.clojure.org/job/data.csv-test-matrix/)
 
 
 Change Log
@@ -278,7 +274,7 @@ Change Log
 Copyright and License
 ========================================
 
-Copyright (c) Jonas Enlund, Rich Hickey, and contributors, 2012-2020. 
+Copyright (c) Jonas Enlund, Rich Hickey, and contributors, 2012-2022. 
 All rights reserved.  The use and
 distribution terms for this software are covered by the Eclipse Public
 License 1.0 (http://opensource.org/licenses/eclipse-1.0.php) which can
