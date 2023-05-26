@@ -240,8 +240,7 @@ Developer Information
 
 * [GitHub project](https://github.com/clojure/data.csv)
 * [Bug Tracker](https://clojure.atlassian.net/browse/DCSV)  
-* [Continuous Integration](https://build.clojure.org/job/data.csv/)
-* [Compatibility Test Matrix](https://build.clojure.org/job/data.csv-test-matrix/)
+* [Continuous Integration](https://github.com/clojure/data.csv/actions/workflows/test.yml)
 
 
 Change Log
@@ -274,7 +273,7 @@ Change Log
 Copyright and License
 ========================================
 
-Copyright (c) Jonas Enlund, Rich Hickey, and contributors, 2012-2022. 
+Copyright (c) Jonas Enlund, Rich Hickey, and contributors, 2012-2023. 
 All rights reserved.  The use and
 distribution terms for this software are covered by the Eclipse Public
 License 1.0 (http://opensource.org/licenses/eclipse-1.0.php) which can
