@@ -14,30 +14,29 @@ Releases and Dependency Information
 
 This project follows the version scheme MAJOR.MINOR.PATCH where each component provides some relative indication of the size of the change, but does not follow semantic versioning. In general, all changes endeavor to be non-breaking (by moving to new names rather than by breaking existing names).
 
-Latest stable release: 1.0.1
+Latest stable release: 1.1.0
 
 * [All Released Versions](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.clojure%22%20AND%20a%3A%22data.csv%22)
-
 * [Development Snapshot Versions](https://oss.sonatype.org/index.html#nexus-search;gav~org.clojure~data.csv~~~)
 
-[CLI/`deps.edn`](https://clojure.org/reference/deps_and_cli) dependency information:
+[CLI/`deps.edn`](https://clojure.org/reference/deps_edn) dependency information:
 ```clojure
-org.clojure/data.csv {:mvn/version "1.0.1"}
+org.clojure/data.csv {:mvn/version "1.1.0"}
 ```
 
 [Leiningen](https://github.com/technomancy/leiningen) dependency information:
 
 ```clojure
-    [org.clojure/data.csv "1.0.1"]
+    [org.clojure/data.csv "1.1.0"]
 ```
 
-[Maven](http://maven.apache.org/) dependency information:
+[Maven](https://maven.apache.org/) dependency information:
 
 ```xml
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>data.csv</artifactId>
-      <version>1.0.1</version>
+      <version>1.1.0</version>
     </dependency>
 ```
 
@@ -246,25 +245,21 @@ Developer Information
 Change Log
 ====================
 
+* Release 1.1.0 on 2024-02-19
+  * Update parent pom version
 * Release 1.0.1 on 2022-04-04
   * Lift construction requiring quote out of the quote? function in write-csv
-
 * Release 1.0.0 on 2020-02-18
-
 * Release 0.1.4 on 2017-04-05
   * [DCSV-16](https://dev.clojure.org/jira/browse/DCSV-16) Resolve some reflection warnings
-
 * Release 0.1.3 on 2015-08-10
-  * [DCSV-4](http://dev.clojure.org/jira/browse/DCSV-4) Allow carriage
+  * [DCSV-4](https://dev.clojure.org/jira/browse/DCSV-4) Allow carriage
     return by itself as a record separator
-
 * Release 0.1.2 on 2012-02-24
   * Fixed keyword params for `write-csv`
-
 * Release 0.1.1 on 2012-02-14
   * Added quote? keyword param to write-csv
   * Code cleanup
-
 * Release 0.1.0 on 2011-08-26
   * Initial release.
 
@@ -273,7 +268,7 @@ Change Log
 Copyright and License
 ========================================
 
-Copyright (c) Jonas Enlund, Rich Hickey, and contributors, 2012-2023. 
+Copyright (c) Jonas Enlund, Rich Hickey, and contributors.
 All rights reserved.  The use and
 distribution terms for this software are covered by the Eclipse Public
 License 1.0 (https://opensource.org/license/epl-1-0/) which can
